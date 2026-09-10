@@ -1,3 +1,5 @@
+import { startJourney } from './journey.js';
+
 const button = document.querySelector('.footer-heart');
 const sky = document.querySelector('.parachute-sky');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -11,10 +13,12 @@ button.addEventListener('click', async () => {
   let frame;
   let resize;
   let sizeObserver;
+  let specialButton;
   const dispose = () => {
     cancelAnimationFrame(frame);
     window.removeEventListener('resize', resize);
     sizeObserver?.disconnect();
+    specialButton?.remove();
     const geometries = new Set();
     const materials = new Set();
     scene?.traverse(object => {
@@ -82,14 +86,14 @@ button.addEventListener('click', async () => {
     const canopyGeometry = new THREE.ShapeGeometry(shape, 24);
     const reduced = motion.matches;
     const count = reduced ? 6 : width < 600 ? 12 : 18;
-    const blueIndex = Math.floor(Math.random() * count);
+    const specialIndex = Math.floor(Math.random() * count);
     const parachuters = [];
     for (let i = 0; i < count; i++) {
       const group = new THREE.Group();
       const canopy = new THREE.Mesh(canopyGeometry, new THREE.MeshBasicMaterial({
-        color: i === blueIndex
-          ? 0x87bce0
-          : new THREE.Color().setHSL(0.93 + (i / count) * 0.055, 0.58, 0.66 + (i / count) * 0.2),
+        color: i === specialIndex
+          ? 0x80334c
+          : new THREE.Color().setHSL(0.93 + (i / count) * 0.055, 0.62, 0.55 + (i / count) * 0.17),
       }));
       canopy.position.set(0, 32, 2);
       group.add(canopy);
@@ -122,6 +126,16 @@ button.addEventListener('click', async () => {
       });
     }
     const start = performance.now();
+    specialButton = document.createElement('button');
+    specialButton.className = 'special-parachuter';
+    specialButton.setAttribute('aria-label', 'Follow the maroon parachuter on an adventure');
+    specialButton.hidden = true;
+    document.body.append(specialButton);
+    specialButton.addEventListener('click', () => {
+      // The journey copies the meshes before the falling scene is released.
+      startJourney(THREE, parachuters[specialIndex].group, button);
+      dispose();
+    });
     function animate(now) {
       const elapsed = (now - start) / 1000;
       let remaining = false;
@@ -144,6 +158,14 @@ button.addEventListener('click', async () => {
         });
       }
       if (reduced) sky.style.opacity = String(Math.min(elapsed * 3, 1, Math.max(0, (3 - elapsed) * 2)));
+      const special = parachuters[specialIndex].group;
+      const scale = special.scale.x;
+      const specialTop = height / 2 - special.position.y - 70 * scale;
+      specialButton.hidden = !special.visible || specialTop < 0 || specialTop + 145 * scale > height;
+      specialButton.style.left = `${width / 2 + special.position.x - 42 * scale}px`;
+      specialButton.style.top = `${height / 2 - special.position.y - 70 * scale}px`;
+      specialButton.style.width = `${84 * scale}px`;
+      specialButton.style.height = `${145 * scale}px`;
       if (!remaining) return dispose();
       renderer.render(scene, camera);
       frame = requestAnimationFrame(animate);

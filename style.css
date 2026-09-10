@@ -35,3 +35,27 @@ body { position: relative; }
   z-index: 10;
 }
 .parachute-sky canvas { display: block; width: 100%; height: 100%; }
+
+.special-parachuter {
+  position: absolute;
+  z-index: 11;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 40%;
+  -webkit-tap-highlight-color: transparent;
+}
+.special-parachuter:focus-visible { outline: 2px dashed #80334c; outline-offset: 3px; }
+.journey-flight {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+}
+.journey-flight canvas { display: block; width: 100%; height: 100%; }
+
+body.journey-active { background-size: 100vw 100vh; background-repeat: no-repeat; background-attachment: fixed; }
+
+.journey-scroll { width: 100%; overflow: hidden; overflow-anchor: none; }
+.journey-track { position: relative; }
