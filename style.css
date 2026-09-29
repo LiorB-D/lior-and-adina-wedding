@@ -26,6 +26,8 @@ footer{font-size:21px}
   border-radius: 50%;
 }
 .footer-heart:hover { color: #b56c8a; background: #dca5b520; }
+footer p { font-family: 'DM Sans', sans-serif; font-size: 13px; margin: 8px 0 0; }
+footer a { color: #6e647b; text-decoration: underline; text-underline-offset: 3px; }
 body { position: relative; }
 .parachute-sky {
   position: absolute;
